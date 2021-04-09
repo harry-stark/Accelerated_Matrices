@@ -30,7 +30,7 @@ Matrix<T>::Matrix(int rows, int columns) : m(rows), n(columns)
 }
 
 template <typename T>
-Matrix<T>::~Matrix(){}
+Matrix<T>::~Matrix() {}
 
 template <typename T>
 Matrix<T> &Matrix<T>::operator=(Matrix<T> const &other)
@@ -59,39 +59,55 @@ Matrix<T> &Matrix<T>::operator=(Matrix<T> const &other)
 template <typename T>
 Matrix<T> Matrix<T>::operator+(Matrix<T> const other)
 {
-
+    Matrix<T> temp(other.m, other.n);
     if ((this->m == other.m) && this->n == other.n)
     {
+
         for (int i = 0; i < other.m; i++)
         {
             for (int j = 0; j < other.n; j++)
             {
                 //cout<<"We are going to add "<<this->M[i*other.n+j]<<" and "<<other.M[i*other.n+j]<<"\n";
-                this->M[i * other.n + j] = this->M[i * other.n + j] + other.M[i * other.n + j];
+                temp.M[i * other.n + j] = this->M[i * other.n + j] + other.M[i * other.n + j];
                 //cout<<"Added Value: "<<this->M[i*other.n+j]<<"\n";
             }
         }
+        
     }
-    return *this;
+    else
+    {
+        cout << "Dimensions do not match"
+             << "\n";
+    }
+
+    return temp;
 }
 
 template <typename T>
 Matrix<T> Matrix<T>::operator-(Matrix<T> const other)
 {
-
+    Matrix<T> temp(other.m, other.n);
     if ((this->m == other.m) && this->n == other.n)
     {
+
         for (int i = 0; i < other.m; i++)
         {
             for (int j = 0; j < other.n; j++)
             {
                 //cout<<"We are going to add "<<this->M[i*other.n+j]<<" and "<<other.M[i*other.n+j]<<"\n";
-                this->M[i * other.n + j] = this->M[i * other.n + j] - other.M[i * other.n + j];
+                temp.M[i * other.n + j] = this->M[i * other.n + j] - other.M[i * other.n + j];
                 //cout<<"Added Value: "<<this->M[i*other.n+j]<<"\n";
             }
         }
+        
     }
-    return *this;
+    else
+    {
+        cout << "Dimensions do not match"
+             << "\n";
+    }
+
+    return temp;
 }
 
 template <typename T>
