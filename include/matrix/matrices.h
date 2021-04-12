@@ -10,6 +10,7 @@ using namespace std;
 template <typename T>
 class Matrix
 {
+    // A Matrix class
 public:
     int m;
     int n;
@@ -26,16 +27,19 @@ public:
 template <typename T>
 Matrix<T>::Matrix(int rows, int columns) : m(rows), n(columns)
 {
+    //Consructor for matrix class with given rows and columns
     M = new T[rows * columns];
 }
 
 template <typename T>
-Matrix<T>::~Matrix() {}
+Matrix<T>::~Matrix() {
+    //Default Destructor
+}
 
 template <typename T>
 Matrix<T> &Matrix<T>::operator=(Matrix<T> const &other)
 {
-
+    // 
     if ((this->m > 0) && (this->n > 0))
     {
         delete[] M;
@@ -59,6 +63,7 @@ Matrix<T> &Matrix<T>::operator=(Matrix<T> const &other)
 template <typename T>
 Matrix<T> Matrix<T>::operator+(Matrix<T> const other)
 {
+    //Operator + overloading
     Matrix<T> temp(other.m, other.n);
     if ((this->m == other.m) && this->n == other.n)
     {
@@ -67,9 +72,8 @@ Matrix<T> Matrix<T>::operator+(Matrix<T> const other)
         {
             for (int j = 0; j < other.n; j++)
             {
-                //cout<<"We are going to add "<<this->M[i*other.n+j]<<" and "<<other.M[i*other.n+j]<<"\n";
+                
                 temp.M[i * other.n + j] = this->M[i * other.n + j] + other.M[i * other.n + j];
-                //cout<<"Added Value: "<<this->M[i*other.n+j]<<"\n";
             }
         }
         
@@ -94,9 +98,9 @@ Matrix<T> Matrix<T>::operator-(Matrix<T> const other)
         {
             for (int j = 0; j < other.n; j++)
             {
-                //cout<<"We are going to add "<<this->M[i*other.n+j]<<" and "<<other.M[i*other.n+j]<<"\n";
+                
                 temp.M[i * other.n + j] = this->M[i * other.n + j] - other.M[i * other.n + j];
-                //cout<<"Added Value: "<<this->M[i*other.n+j]<<"\n";
+
             }
         }
         
@@ -113,6 +117,7 @@ Matrix<T> Matrix<T>::operator-(Matrix<T> const other)
 template <typename T>
 void fill(Matrix<T> &other)
 {
+    //A function to fill matrix by host code
     for (int i = 0; i < other.m; i++)
     {
         for (int j = 0; j < other.n; j++)
@@ -125,6 +130,7 @@ void fill(Matrix<T> &other)
 template <typename T>
 void printmatrix(Matrix<T> &other)
 {
+    //Function to print matrix
     for (int i = 0; i < other.m; i++)
     {
         for (int j = 0; j < other.n; j++)
@@ -174,17 +180,25 @@ Matrix<T> GEMM(Matrix<T> &other, Matrix<T> &other1)
     //Copy from host to device
     cudaMemcpy(gdata_a, (other.M), bytes_a, cudaMemcpyHostToDevice);
     cudaMemcpy(gdata_b, (other1.M), bytes_b, cudaMemcpyHostToDevice);
+    //temp matrix
     Matrix<T> other2(other.m, other1.n);
 
     if constexpr (std::is_same_v<T, int>)
     {
-
+        //Evaluate Thread Bloack and Grid Dimension
         unsigned int grid_rows = (other2.m + BLOCK_SIZE - 1) / BLOCK_SIZE;
         unsigned int grid_cols = (other2.n + BLOCK_SIZE - 1) / BLOCK_SIZE;
         dim3 dimGrid(grid_cols, grid_rows);
         dim3 dimBlock(BLOCK_SIZE, BLOCK_SIZE);
+
+        //Call the multiplication kernel
         matrixMul<<<dimGrid, dimBlock>>>(gdata_a, gdata_b, gdata_c, other.m, other.n, other1.n);
+
+        // Copy back the matrix
+
         cudaMemcpy(other2.M, gdata_c, bytes_c, cudaMemcpyDeviceToHost);
+
+        //Free Gpu memory
         cudaFree(gdata_a);
         cudaFree(gdata_b);
         cudaFree(gdata_c);
@@ -201,9 +215,10 @@ Matrix<T> GEMM(Matrix<T> &other, Matrix<T> &other1)
         float alpha = 1.0f;
         float beta = 0.0f;
 
+        //Cublas API Call...Notice Transpose has been used.Because Cuda uses Column Major form
         cublasSgemm(handle, CUBLAS_OP_T, CUBLAS_OP_T, other.m, other.n, other1.n, &alpha, gdata_a, other.m, gdata_b, other.n, &beta, gdata_c, other.m);
 
-        // Copy back the three matrices
+        // Copy back the matrix
         cudaMemcpy(other2.M, gdata_c, bytes_c, cudaMemcpyDeviceToHost);
 
         // free gpu memory

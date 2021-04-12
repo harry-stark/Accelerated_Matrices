@@ -12,15 +12,20 @@ int main()
     fill(z1);
     printmatrix(z);
     printmatrix(z1);
+    std::cout<<"\n";
+
+
+    std::cout<<"Adding the above two matrices"<<std::endl;
+    std::cout<<"\n";
     z2=z+z1;
     printmatrix(z2);
-    printmatrix(z);
-    printmatrix(z1);
+    std::cout<<"\n";
 
+    std::cout<<"Multiplying Z and Z1 matrices"<<std::endl;
+    std::cout<<"\n";
     z3=GEMM(z,z1);
     printmatrix(z3);
-    printmatrix(z);
-    printmatrix(z1);
+    
     
     
     
